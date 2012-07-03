@@ -23,10 +23,6 @@
 PRODUCT_COPY_FILES += \
     device/htc/supersonic/prebuilt/etc/gps.conf:system/etc/gps.conf
 	
-# Market Fix
-PRODUCT_COPY_FILES += \
-    device/htc/supersonic/prebuilt/etc/init.d/99marketfix:system/etc/init.d/99marketfix
-
 PRODUCT_COPY_FILES += \
     device/htc/supersonic/prebuilt/root/init.supersonic.rc:root/init.supersonic.rc \
     device/htc/supersonic/prebuilt/root/init.supersonic.usb.rc:root/init.supersonic.usb.rc \
