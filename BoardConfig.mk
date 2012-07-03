@@ -25,7 +25,6 @@
 # against the traditional rules of inheritance).
 USE_CAMERA_STUB := true
 # Additional Camera hacks
-TARGET_LEGACY_CAM := true
 TARGET_LEGACY_CAMERA := true
 TARGET_CAMERA_WRAPPER := qsd8k
 BOARD_HAVE_HTC_FFC := true
