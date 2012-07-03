@@ -24,50 +24,21 @@
 # variant, so that it gets overwritten by the parent (which goes
 # against the traditional rules of inheritance).
 USE_CAMERA_STUB := true
+# Additional Camera hacks
+TARGET_LEGACY_CAMERA := true
+TARGET_CAMERA_WRAPPER := qsd8k
+BOARD_HAVE_HTC_FFC := true
 
 # inherit from the proprietary version
 -include vendor/htc/supersonic/BoardConfigVendor.mk
-
-TARGET_NO_BOOTLOADER := true
-
-TARGET_BOARD_PLATFORM := qsd8k
-TARGET_BOARD_PLATFORM_GPU := qcom-adreno200
-
-TARGET_CPU_ABI := armeabi-v7a
-TARGET_CPU_ABI2 := armeabi
-TARGET_ARCH_VARIANT := armv7-a-neon
-ARCH_ARM_HAVE_TLS_REGISTER := true
+# inherit common defines for all qsd8k devices
+include device/htc/qsd8k-common/BoardConfigCommon.mk
 
 TARGET_BOOTLOADER_BOARD_NAME := supersonic
-
-# Wifi related defines
-BOARD_WPA_SUPPLICANT_DRIVER := WEXT
-WPA_SUPPLICANT_VERSION      := VER_0_6_X
-BOARD_WLAN_DEVICE           := bcm4329
-WIFI_DRIVER_MODULE_PATH     := "/system/lib/modules/bcm4329.ko"
-WIFI_DRIVER_FW_STA_PATH     := "/vendor/firmware/fw_bcm4329.bin"
-WIFI_DRIVER_FW_AP_PATH      := "/vendor/firmware/fw_bcm4329_apsta.bin"
-WIFI_DRIVER_MODULE_ARG      := "firmware_path=/vendor/firmware/fw_bcm4329.bin nvram_path=/proc/calibration"
-WIFI_DRIVER_MODULE_NAME     := "bcm4329"
-
-BOARD_USES_GENERIC_AUDIO := false
 
 BOARD_KERNEL_CMDLINE := no_console_suspend=1
 BOARD_KERNEL_BASE := 0x20000000
 BOARD_KERNEL_NEW_PPPOX := true
-
-BOARD_HAVE_BLUETOOTH := true
-BOARD_HAVE_BLUETOOTH_BCM := true
-
-BOARD_VENDOR_QCOM_AMSS_VERSION := 3200
-
-BOARD_VENDOR_USE_AKMD := akm8973
-
-BOARD_EGL_CFG := device/htc/supersonic/egl.cfg
-
-BOARD_USES_QCOM_LIBS := true
-BOARD_USES_QCOM_GPS := true
-BOARD_USES_QCOM_LIBRPC := true
 
 BOARD_USE_OPENSSL_ENGINE := true
 
@@ -77,10 +48,9 @@ BOARD_USE_REVERSE_FFC := true
 BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := supersonic
 BOARD_VENDOR_QCOM_GPS_LOC_API_AMSS_VERSION := 1240
 
-BOARD_HAVE_FM_RADIO := true
-BOARD_GLOBAL_CFLAGS += -DHAVE_FM_RADIO
-
 BOARD_HAVE_SQN_WIMAX := true
+
+TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/usb_mass_storage/lun0/file
 
 # # cat /proc/mtd
 # dev:    size   erasesize  name
@@ -103,5 +73,10 @@ BOARD_HAS_NO_SELECT_BUTTON := 1
 
 #TARGET_RECOVERY_UI_LIB := librecovery_ui_supersonic librecovery_ui_htc
 
-TARGET_RELEASETOOLS_EXTENSIONS := device/htc/common
-TARGET_PREBUILT_KERNEL := device/htc/supersonic/kernel
+TARGET_KERNEL_CONFIG    := evervolv_supersonic_defconfig
+TARGET_PREBUILT_KERNEL  := device/htc/supersonic/prebuilt/root/kernel
+
+##Testing
+TARGET_BOOTANIMATION_PRELOAD :=true
+ADDITIONAL_DEFAULT_PROPERTIES += ro.secure=0
+ENABLE_WEBGL := true

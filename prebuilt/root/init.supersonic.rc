@@ -1,4 +1,12 @@
+import init.supersonic.usb.rc
+
 on init
+
+    export EXTERNAL_STORAGE /mnt/sdcard
+    mkdir /mnt/sdcard 0000 system system
+    # for backwards compatibility
+    symlink /mnt/sdcard /sdcard
+
     mount rootfs rootfs / remount
     mkdir /app-cache 01777 system system
     mount tmpfs tmpfs /app-cache size=8m
@@ -34,7 +42,8 @@ on boot
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
     chmod 0660 /sys/class/rfkill/rfkill0/state
     chown system system /sys/module/serial/parameters/modem_enabled
-    chown system system /dev/ttyHSUSB0
+    chown bluetooth bluetooth /dev/ttyHS0
+    chmod 0770 /dev/ttyHS0
     chown system system /dev/smd9
     chown radio radio /sys/module/msm_flashlight/parameters/phone_status
 
@@ -54,6 +63,13 @@ on boot
     # flashlight
     chown system camera /sys/devices/platform/flashlight.0/leds/flashlight/brightness
     chmod 0660          /sys/devices/platform/flashlight.0/leds/flashlight/brightness
+
+    # Add permissions for camera access
+    chmod 0666 /dev/msm_camera/config1
+    chmod 0666 /dev/msm_camera/control1
+    chmod 0666 /dev/msm_camera/frame1
+
+    chmod 0666 /dev/graphics/fb0
 
     # Camera status
     chown radio system /sys/camera_led_status/led_ril_status
@@ -77,32 +93,29 @@ on boot
     write /sys/block/mtdblock5/bdi/read_ahead_kb 4
     write /sys/block/mtdblock6/bdi/read_ahead_kb 4
 
-    # Power Management
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 245000
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 998400
-    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ondemand
-    write /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate 40000
-
     # TCP buffer size tweaks to improve throughput
     write /proc/sys/net/core/wmem_max 524288
     write /proc/sys/net/core/rmem_max 524288
 
 service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant \
-    -Dwext -ieth0 -c/data/misc/wifi/wpa_supplicant.conf
+    -Dwext -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf
 #   we will start as root and wpa_supplicant will switch to user wifi
 #   after setting up the capabilities required for WEXT
 #   user wifi
 #   group wifi inet keystore
-    socket wpa_eth0 dgram 660 wifi wifi
+    class main
+    socket wpa_wlan0 dgram 660 wifi wifi
     disabled
     oneshot
 
 
-service dhcpcd_eth0 /system/bin/dhcpcd -ABKL eth0
+service dhcpcd_wlan0 /system/bin/dhcpcd -ABKL
+    class main
     disabled
     oneshot
 
-service iprenew_eth0 /system/bin/dhcpcd -n
+service iprenew_wlan0 /system/bin/dhcpcd -n
+    class main
     disabled
     oneshot
 
@@ -123,6 +136,7 @@ on property:service.modem.enable=0
 
 # compass/accelerometer daemon
 service akmd /system/bin/akmd
+    class main
     user compass
     group compass misc input
 
@@ -189,7 +203,16 @@ service getWMXPropd /system/bin/getWiMAXPropDaemond
 
 service hciattach /system/bin/brcm_patchram_plus --enable_hci --enable_lpm \
     --baudrate 3000000 --patchram /etc/firmware/bcm4329.hcd /dev/ttyHS0
+    class main
     user bluetooth
     group bluetooth net_bt_admin
     disabled
 
+service qcom-post-boot /system/bin/sh /system/etc/init.qcom.post_boot.sh
+    class late_start
+    user root
+    disabled
+    oneshot
+
+on property:dev.bootcomplete=1
+    start qcom-post-boot
