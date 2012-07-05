@@ -96,6 +96,10 @@ PRODUCT_COPY_FILES += \
     device/htc/supersonic/prebuilt/lib/libcamera.so:obj/lib/libcamera.so \
     device/htc/supersonic/prebuilt/lib/libcamera.so:system/lib/libcamera.so
 
+# Market Fix
+PRODUCT_COPY_FILES += \
+    device/htc/supersonic/prebuilt/etc/init.d/99marketfix:system/etc/init.d/99marketfix
+
 # media profiles and capabilities spec
 $(call inherit-product, device/htc/supersonic/media_a1026.mk)
 
