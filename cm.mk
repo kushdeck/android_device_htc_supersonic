@@ -4,6 +4,9 @@ $(call inherit-product, device/htc/supersonic/supersonic.mk)
 # Inherit some common CM stuff.
 $(call inherit-product, vendor/cm/config/common_full_phone.mk)
 
+# Inherit WiMAX stuff
+$(call inherit-product, vendor/cm/config/wimax.mk)
+
 #
 # Setup device specific product configuration.
 #
